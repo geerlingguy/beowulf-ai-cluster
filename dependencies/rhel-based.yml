@@ -1,0 +1,18 @@
+---
+- name: Update dnf cache.
+  ansible.builtin.dnf:
+    update_cache: true
+  become: true
+
+- name: Install dependencies.
+  ansible.builtin.package:
+    name:
+      - '@development-tools'
+      - cmake
+      - vulkan
+      - vulkan-tools
+      - vulkan-loader-devel
+      - glslc
+      - libcurl-devel
+    state: present
+  become: true

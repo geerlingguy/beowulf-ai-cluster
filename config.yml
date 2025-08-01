@@ -1,0 +1,11 @@
+---
+# Working directory where llama.cpp will be compiled.
+working_dir: /opt
+
+llama_source: https://github.com/ggerganov/llama.cpp
+llama_version: master
+llama_build_opts: "-DGGML_VULKAN=1"
+
+llama_quick_benchmark: false
+
+nodecount: "{{ ansible_play_hosts | length | int }}"

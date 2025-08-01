@@ -1,0 +1,17 @@
+---
+- name: Update apt cache.
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 600
+  become: true
+
+- name: Install dependencies.
+  ansible.builtin.package:
+    # TODO: This needs updating based on rhel-based.yml
+    name:
+      - git
+      - build-essential
+      - gfortran
+      - automake
+    state: present
+  become: true
