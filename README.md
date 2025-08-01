@@ -4,8 +4,6 @@ With AI getting all the headlines and stock bubbles recently, I thought I'd crea
 
 ## Installation and Usage
 
-## Benchmarking - Cluster
-
 Make sure you have Ansible installed (`pip3 install ansible`), then copy the following files:
 
   - `cp example.hosts.ini hosts.ini`: This is an inventory of all the hosts in your cluster (or just a single computer).
