@@ -15,9 +15,6 @@
     - ansible.builtin.include_tasks: dependencies/debian-based.yml
       when: ansible_os_family == 'Debian'
 
-    - ansible.builtin.include_tasks: dependencies/arch-based.yml
-      when: ansible_os_family == 'Archlinux'
-
     - name: Ensure working directory exists.
       ansible.builtin.file:
         path: "{{ working_dir }}"

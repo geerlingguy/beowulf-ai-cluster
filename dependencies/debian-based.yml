@@ -7,11 +7,9 @@
 
 - name: Install dependencies.
   ansible.builtin.package:
-    # TODO: This needs updating based on rhel-based.yml
     name:
       - git
       - build-essential
-      - gfortran
-      - automake
+      - cmake
     state: present
   become: true
