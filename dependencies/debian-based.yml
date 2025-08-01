@@ -10,6 +10,7 @@
     name:
       - git
       - build-essential
+      - g++
       - cmake
     state: present
   become: true
