@@ -41,11 +41,14 @@ There are two benchmarks included:
   - **Quick benchmark**: Runs on each node indepdently, and can be used to compare relative node performance (or to verify all your nodes have GPUs or NPUs recognized and utilized correctly). Performance results will be printed for each node individually.
   - **Full benchmark**: Configures llama.cpp in RPC mode, and runs a benchmark against the entire cluster. Performance results will be summarized for the entire cluster.
 
-To run benchmarks, set one of the following to `true` in `config.yml` and run the playbook again:
+To run benchmarks, run the playbook with the proper tag:
 
-```yaml
-llama_quick_benchmark: false
-llama_full_benchmark: false
+```
+# For quick benchmarks:
+ansible-playbook main.yml --tags quick-bench
+
+# For full benchmarks:
+ansible-playbook main.yml --tags full-bench
 ```
 
 ## License
