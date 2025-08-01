@@ -58,72 +58,12 @@
 
     - name: Download a model to the models directory for testing.
       ansible.builtin.get_url:
-        url: https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf
-        checksum: "sha256:6c1a2b41161032677be168d354123594c0e6e67d2b9227c84f296ad037c728ff"
+        url: "{{ llama_test_model_url }}"
+        checksum: "{{ llama_test_model_checksum }}"
         force: false
-        dest: "{{ working_dir }}/llama.cpp/models/Llama-3.2-3B-Instruct-Q4_K_M.gguf"
+        dest: "{{ working_dir }}/llama.cpp/models/{{ llama_test_model_filename }}"
         mode: 0644
       become: true
-
-# CLEANUP FROM TOP500 PLAYBOOK
-# - name: Configure SSH connections between nodes.
-#   hosts: cluster
-#   become: false
-#   tags: ['ssh']
-
-#   vars_files: ['config.yml']
-#   vars:
-#     host_ips: []
-
-#   tasks:
-#     - name: Ensure .ssh directory exists.
-#       ansible.builtin.file:
-#         path: "{{ ssh_user_home }}/.ssh"
-#         state: directory
-#         owner: "{{ ssh_user }}"
-#         group: "{{ ssh_user }}"
-#         mode: 0700
-
-#     - name: Generate an OpenSSH keypair.
-#       community.crypto.openssh_keypair:
-#         path: "{{ ssh_user_home }}/.ssh/id_rsa"
-#         size: 2048
-
-#     - name: Read out ssh pubkey from each host.
-#       ansible.builtin.command: cat "{{ ssh_user_home }}/.ssh/id_rsa.pub"
-#       changed_when: false
-#       register: ssh_pubkey
-
-#     - name: Combine pubkeys into single list.
-#       ansible.builtin.set_fact:
-#         combined_ssh_pubkeys: "{{ ansible_play_hosts | map('extract', hostvars, 'ssh_pubkey') | map(attribute='stdout') | list }}"
-#       run_once: true
-
-#     - name: Write all pubkeys to each host.
-#       ansible.posix.authorized_key:
-#         user: "{{ ssh_user }}"
-#         state: present
-#         key: "{{ item }}"
-#       loop: "{{ combined_ssh_pubkeys }}"
-
-#     - name: Generate list of host IP addresses.
-#       ansible.builtin.set_fact:
-#         host_ips: "{{ host_ips + [ hostvars[item].ansible_default_ipv4.address ] }}"
-#       loop: "{{ groups['cluster'] }}"
-
-#     - name: Accept hostkeys for each host on each host.
-#       ansible.builtin.command: >-
-#         ssh {{ ssh_user }}@{{ item }} -o StrictHostKeyChecking=accept-new date
-#       loop: "{{ host_ips }}"
-
-#     - name: Write chunk of hosts information to the hosts file.
-#       ansible.builtin.blockinfile:
-#         path: /etc/hosts
-#         marker: "# {mark} Ansible MPI host {{ item }}"
-#         block: |
-#           {{ hostvars[item].ansible_default_ipv4.address }} {{ item }} {{ item | replace('.local', '') }}
-#       loop: "{{ groups['cluster'] }}"
-#       become: true
 
 - name: Run quick benchmark.
   hosts: cluster
@@ -131,20 +71,20 @@
   tags: ['never', 'quick-bench']
 
   vars_files: ['config.yml']
-  vars:
-    host_ips: []
 
   tasks:
     - name: Quick benchmark on each node.
       ansible.builtin.command:
-        cmd: >-
-          build/bin/llama-cli -m "models/Llama-3.2-3B-Instruct-Q4_K_M.gguf" -no-cnv -p "Why is the blue sky blue?" -e -ngl 100 -t 4
+        cmd: >
+          build/bin/llama-bench
+          -m "models/{{ llama_test_model_filename }}"
+          {{ llama_bench_opts }}
         chdir: "{{ working_dir }}/llama.cpp"
       register: quick_benchmark_run
 
     - name: Output quick benchmark results.
       ansible.builtin.debug:
-        msg: "{{ quick_benchmark_run.stderr_lines | select('regex', '^llama_perf_context_print') | list }}"
+        var: quick_benchmark_run.stdout
 
 - name: Run full benchmark.
   hosts: cluster
@@ -155,46 +95,60 @@
   vars:
     host_ips: []
 
+  handlers:
+    - name: restart llama-rpc
+      ansible.builtin.service:
+        name: llama-rpc
+        state: stopped
+      become: true
+
   tasks:
     - name: Start llama.cpp in RPC mode on all secondary nodes.
       meta: noop
 
-    # CLEANUP FROM TOP500 PLAYBOOK
-    # - name: Create a file describing nodes for MPI execution.
-    #   ansible.builtin.template:
-    #     src: templates/mpi-node-config.j2
-    #     dest: "{{ hpl_root }}/tmp/hpl-2.3/bin/top500/cluster-hosts"
-    #     mode: 0644
+    - name: Generate list of host IP addresses.
+      ansible.builtin.set_fact:
+        host_ips: "{{ host_ips + [ hostvars[item].ansible_default_ipv4.address ] }}"
+      loop: "{{ groups['cluster'] }}"
 
-    # # Template originally generated using this website:
-    # # https://www.advancedclustering.com/act_kb/tune-hpl-dat-file/
-    # - name: Create HPL.dat file.
-    #   ansible.builtin.template:
-    #     src: templates/HPL.dat.j2
-    #     dest: "{{ hpl_root }}/tmp/hpl-2.3/bin/top500/HPL.dat"
-    #     mode: 0644
+    - name: Generate RPC host list from host IP addresses.
+      ansible.builtin.set_fact:
+        rpc_hosts: "{{ host_ips | join(':' + llama_rpc_port + ',') }}:{{ llama_rpc_port }}"
+      run_once: true
 
-    # - name: Generate list of host IP addresses.
-    #   ansible.builtin.set_fact:
-    #     host_ips: "{{ host_ips + [ hostvars[item].ansible_default_ipv4.address ] }}"
-    #   loop: "{{ groups['cluster'] }}"
+    - name: Copy the llama-rpc systemd unit file.
+      template:
+        src: llama-rpc.service.j2
+        dest: /etc/systemd/system/llama-rpc.service
+        mode: 0644
+      register: llama_rpc_exporter_service
+      notify: restart llama-rpc
+      become: true
 
-    # # If this is not done, the nodes will fail to connect to each other
-    # # causing the playbook to hang at 'Run the benchmark.'
-    # - include_tasks: tasks/firewall-configure.yml
-    #   when: ansible_os_family == "RedHat"
+    - name: Reload systemd daemon if unit file is changed.
+      systemd:
+        daemon_reload: true
+      notify: restart llama-rpc
+      when: llama_rpc_exporter_service is changed
+      become: true
 
-    # - name: Run the benchmark.
-    #   ansible.builtin.command: >-
-    #     "{{ hpl_root }}/mpich/bin/mpirun" -f cluster-hosts ./xhpl
-    #   args:
-    #     chdir: "{{ hpl_root }}/tmp/hpl-2.3/bin/top500"
-    #   register: mpirun_output
-    #   run_once: true
+    - name: Ensure llama-rpc is running.
+      service:
+        name: llama-rpc
+        state: started
+      become: true
 
-    # - include_tasks: tasks/firewall-reset.yml
-    #   when: ansible_os_family == "RedHat"
+    - name: Run benchmark across all nodes from first node
+      ansible.builtin.command:
+        cmd: >
+          build/bin/llama-bench
+          -m "models/{{ llama_test_model_filename }}"
+          {{ llama_bench_opts }}
+          --rpc {{ rpc_hosts }}
+        chdir: "{{ working_dir }}/llama.cpp"
+      register: full_benchmark_run
+      run_once: true
 
-    # - name: Output the results.
-    #   debug: var=mpirun_output.stdout
-    #   run_once: true
+    - name: Output the results.
+      debug: var=full_benchmark_run.stdout
+      run_once: true

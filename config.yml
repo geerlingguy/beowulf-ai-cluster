@@ -2,8 +2,21 @@
 # Working directory where llama.cpp will be compiled.
 working_dir: /opt
 
+llama_user: jgeerling
+
 llama_source: https://github.com/ggerganov/llama.cpp
 llama_version: master
-llama_build_opts: "-DGGML_VULKAN=1"
+llama_build_opts: "-DGGML_VULKAN=1 -DGGML_RPC=ON"
+
+llama_test_model_url: https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf
+llama_test_model_checksum: "sha256:6c1a2b41161032677be168d354123594c0e6e67d2b9227c84f296ad037c728ff"
+llama_test_model_filename: "Llama-3.2-3B-Instruct-Q4_K_M.gguf"
+# llama_test_model_filename: "DeepSeek-R1/DeepSeek-R1-Q4_K_M-00001-of-00011.gguf"
+
+# See https://github.com/ggml-org/llama.cpp/blob/master/tools/llama-bench/README.md#syntax
+llama_bench_opts: "-n 128 -p 512 -pg 512,128 -ngl 99 -fa 1 -r 2"
+
+llama_rpc_port: "50052"
+llama_rpc_start_command: "{{ working_dir }}/llama.cpp/build/bin/rpc-server --host {{ ansible_default_ipv4.address }} --port {{ llama_rpc_port }} --cache"
 
 nodecount: "{{ ansible_play_hosts | length | int }}"

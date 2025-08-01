@@ -32,6 +32,16 @@ This will run two separate plays:
   1. Setup: downloads and compiles all the code required to run an AI model.
   2. Benchmark: Runs AI benchmarks, outputting the results in your console.
 
+## Rebuilding llama.cpp
+
+The quickest way to force a _rebuild_ of llama.cpp (like if you updated the `llama_build_opts` or want a later version) is to run:
+
+```
+ansible all -a "rm -rf /opt/llama.cpp" -b
+```
+
+Eventually I might make it easier to rebuild things automatically. But for now, this is simple, and it works.
+
 ## Quick vs Full Benchmarks
 
 There are two benchmarks included:

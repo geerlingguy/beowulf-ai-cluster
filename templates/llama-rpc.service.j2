@@ -1,0 +1,13 @@
+[Unit]
+Description="llama RPC Server"
+After=network.target
+
+[Service]
+ExecStart={{ llama_rpc_start_command }}
+User={{ llama_user }}
+Group={{ llama_user }}
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

@@ -12,5 +12,6 @@
       - build-essential
       - g++
       - cmake
+      - nvtop
     state: present
   become: true

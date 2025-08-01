@@ -14,5 +14,6 @@
       - vulkan-loader-devel
       - glslc
       - libcurl-devel
+      - nvtop
     state: present
   become: true
