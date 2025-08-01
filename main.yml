@@ -128,7 +128,29 @@
 #       loop: "{{ groups['cluster'] }}"
 #       become: true
 
-- name: Run AI benchmark.
+- name: Run quick benchmark.
+  hosts: cluster
+  become: false
+  tags: ['benchmark']
+  when: llama_quick_benchmark
+
+  vars_files: ['config.yml']
+  vars:
+    host_ips: []
+
+  tasks:
+    - name: Quick benchmark on each node.
+      ansible.builtin.command:
+        cmd: >-
+          build/bin/llama-cli -m "models/Llama-3.2-3B-Instruct-Q4_K_M.gguf" -no-cnv -p "Why is the blue sky blue?" -e -ngl 100 -t 4
+        chdir: "{{ working_dir }}/llama.cpp"
+      register: quick_benchmark_run
+
+    - name: Output quick benchmark results.
+      ansible.builtin.debug:
+        msg: "{{ quick_benchmark_run.stderr_lines | select('regex', '^llama_perf_context_print') | list }}"
+
+- name: Run full benchmark.
   hosts: cluster
   become: false
   tags: ['benchmark']

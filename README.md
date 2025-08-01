@@ -34,9 +34,23 @@ This will run two separate plays:
   1. Setup: downloads and compiles all the code required to run an AI model.
   2. Benchmark: Runs AI benchmarks, outputting the results in your console.
 
+## Quick vs Full Benchmarks
+
+There are two benchmarks included:
+
+  - **Quick benchmark**: Runs on each node indepdently, and can be used to compare relative node performance (or to verify all your nodes have GPUs or NPUs recognized and utilized correctly). Performance results will be printed for each node individually.
+  - **Full benchmark**: Configures llama.cpp in RPC mode, and runs a benchmark against the entire cluster. Performance results will be summarized for the entire cluster.
+
+To run benchmarks, set one of the following to `true` in `config.yml` and run the playbook again:
+
+```yaml
+llama_quick_benchmark: false
+llama_full_benchmark: false
+```
+
 ## License
 
-AGPLv3 or later.
+GPLv3
 
 ## Author
 
