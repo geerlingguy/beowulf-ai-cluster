@@ -4,7 +4,7 @@
 - name: Compile llama.cpp.
   hosts: cluster
   become: false
-  tags: ['setup']
+  tags: ['llama-setup']
 
   vars_files: ['config.yml']
 
@@ -56,10 +56,10 @@
         mode: 0644
       become: true
 
-- name: Run quick benchmark.
+- name: Run llama.cpp benchmark individually on each node.
   hosts: cluster
   become: false
-  tags: ['never', 'quick-bench']
+  tags: ['never', 'llama-bench']
 
   vars_files: ['config.yml']
 
@@ -86,10 +86,10 @@
       ansible.builtin.debug:
         var: quick_benchmark_run.stdout
 
-- name: Run full benchmark.
+- name: Run llama.cpp benchmark across the full cluster.
   hosts: cluster
   become: false
-  tags: ['never', 'full-bench']
+  tags: ['never', 'llama-bench-cluster']
 
   vars_files: ['config.yml']
   vars:
@@ -103,8 +103,14 @@
       become: true
 
   tasks:
-    - name: Start llama.cpp in RPC mode on all secondary nodes.
-      meta: noop
+    - name: Download the benchmark model.
+      ansible.builtin.get_url:
+        url: "{{ llama_test_model_url }}"
+        checksum: "{{ llama_test_model_checksum }}"
+        force: false
+        dest: "{{ working_dir }}/llama.cpp/models/{{ llama_test_model_filename }}"
+        mode: 0644
+      become: true
 
     - name: Generate list of host IP addresses.
       ansible.builtin.set_fact:
@@ -138,8 +144,6 @@
         state: started
       become: true
 
-    - fail:
-
     - name: Run benchmark across all nodes from first node
       ansible.builtin.command:
         cmd: >
@@ -154,3 +158,9 @@
     - name: Output the results.
       debug: var=full_benchmark_run.stdout
       run_once: true
+
+    - name: Ensure llama-rpc is stopped.
+      service:
+        name: llama-rpc
+        state: stopped
+      become: true

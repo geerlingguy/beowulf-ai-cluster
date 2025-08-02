@@ -42,21 +42,21 @@ ansible all -a "rm -rf /opt/llama.cpp" -b
 
 Eventually I might make it easier to rebuild things automatically. But for now, this is simple, and it works.
 
-## Quick vs Full Benchmarks
+## Benchmarks
 
-There are two benchmarks included:
+There are multiple benchmarks included:
 
-  - **Quick benchmark**: Runs on each node indepdently, and can be used to compare relative node performance (or to verify all your nodes have GPUs or NPUs recognized and utilized correctly). Performance results will be printed for each node individually.
-  - **Full benchmark**: Configures llama.cpp in RPC mode, and runs a benchmark against the entire cluster. Performance results will be summarized for the entire cluster.
+  - **Llama benchmark - individual nodes**: Runs `llama-bench` on each node indepdently, and can be used to compare relative node performance (or to verify all your nodes have GPUs or NPUs recognized and utilized correctly). Performance results will be printed for each node individually.
+  - **Llama benchmark - full cluster (rpc-server)**: Configures llama.cpp in RPC mode, and runs a benchmark against the entire cluster. Performance results will be summarized for the entire cluster.
 
 To run benchmarks, run the playbook with the proper tag:
 
 ```
-# For quick benchmarks:
-ansible-playbook main.yml --tags quick-bench
+# For llama.cpp benchmark on each node individually:
+ansible-playbook main.yml --tags llama-bench
 
-# For full benchmarks:
-ansible-playbook main.yml --tags full-bench
+# For llama.cpp benchmark on full cluster (RPC):
+ansible-playbook main.yml --tags llama-bench-cluster
 ```
 
 ## License
