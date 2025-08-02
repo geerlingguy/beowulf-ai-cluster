@@ -56,15 +56,6 @@
         mode: 0644
       become: true
 
-    - name: Download a model to the models directory for testing.
-      ansible.builtin.get_url:
-        url: "{{ llama_test_model_url }}"
-        checksum: "{{ llama_test_model_checksum }}"
-        force: false
-        dest: "{{ working_dir }}/llama.cpp/models/{{ llama_test_model_filename }}"
-        mode: 0644
-      become: true
-
 - name: Run quick benchmark.
   hosts: cluster
   become: false
@@ -73,6 +64,15 @@
   vars_files: ['config.yml']
 
   tasks:
+    - name: Download the benchmark model.
+      ansible.builtin.get_url:
+        url: "{{ llama_test_model_url }}"
+        checksum: "{{ llama_test_model_checksum }}"
+        force: false
+        dest: "{{ working_dir }}/llama.cpp/models/{{ llama_test_model_filename }}"
+        mode: 0644
+      become: true
+
     - name: Quick benchmark on each node.
       ansible.builtin.command:
         cmd: >
@@ -137,6 +137,8 @@
         name: llama-rpc
         state: started
       become: true
+
+    - fail:
 
     - name: Run benchmark across all nodes from first node
       ansible.builtin.command:

@@ -3,6 +3,7 @@ Description="llama RPC Server"
 After=network.target
 
 [Service]
+Environment="GGML_VK_PREFER_HOST_MEMORY=1"
 ExecStart={{ llama_rpc_start_command }}
 User={{ llama_user }}
 Group={{ llama_user }}
