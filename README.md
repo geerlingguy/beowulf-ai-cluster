@@ -42,7 +42,7 @@ ansible all -a "rm -rf /opt/llama.cpp" -b
 
 Eventually I might make it easier to rebuild things automatically. But for now, this is simple, and it works.
 
-## Benchmarks
+## Benchmarks - Automated
 
 There are multiple benchmarks included:
 
@@ -57,6 +57,24 @@ ansible-playbook main.yml --tags llama-bench
 
 # For llama.cpp benchmark on full cluster (RPC):
 ansible-playbook main.yml --tags llama-bench-cluster
+```
+
+## Benchmarks - Manual
+
+If you'd like to run a manual benchmark (e.g. to debug what's happening with something like `llama-bench` on a larger model), here's how to do it:
+
+  1. Launch `llama-rpc`: `ansible all -a "systemctl status llama-rpc" -b`
+  2. Run a benchmark from one of the nodes (e.g. node 1):
+
+```
+cd /opt/llama.cpp
+build/bin/llama-bench -v -m models/Llama-3.1-405B-Q4_K_M.gguf -n 128 -p 512 -pg 512,128 -ngl 125 -fa 1 -r 2 --rpc 10.0.2.233:50052,10.0.2.209:50052,10.0.2.242:50052,10.0.2.223:50052
+```
+
+You can grab all your node IP addresses with:
+
+```
+ansible all -m ansible.builtin.setup -a "filter=ansible_default_ipv4"
 ```
 
 ## License
