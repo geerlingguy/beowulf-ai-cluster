@@ -2,7 +2,6 @@
 - name: Set up distributed-llama.
   hosts: cluster
   become: false
-  tags: ['distributed-llama-setup']
 
   vars_files: ['../config.yml']
 
@@ -39,6 +38,6 @@
     # TODO:
     #   - Get a model: https://github.com/b4rtaz/distributed-llama?tab=readme-ov-file#-setup-root-node-by-single-command
     #     - `cd /opt/distributed-llama && sudo python launch.py llama3_2_1b_instruct_q40`
-    #   - Run on worker: `./dllama worker --port 9999 --nthreads 32`
-    #   - Run on root: `./dllama inference --model models/llama3_2_1b_instruct_q40/llama3_2_1b_instruct_q40.m --tokenizer models/llama3_2_1b_instruct_q40/dllama_tokenizer_llama3_2_1b_instruct_q40.t --buffer-float-type q80 --prompt "Hello world" --steps 16 --nthreads 32 --workers 10.0.2.209:9999  --gpu-index 0`
-    #                   ./dllama chat --model models/llama3_2_1b_instruct_q40/dllama_model_llama3_2_1b_instruct_q40.m --tokenizer models/llama3_2_1b_instruct_q40/dllama_tokenizer_llama3_2_1b_instruct_q40.t --buffer-float-type q80 --nthreads 32 --max-seq-len 4096 --gpu-index 0
+    #   - Run on worker: `./dllama worker --port 9999 --nthreads 1 --gpu-index 0`
+    #   - Run on root: `./dllama inference --model models/llama3_2_1b_instruct_q40/dllama_model_llama3_2_1b_instruct_q40.m --tokenizer models/llama3_2_1b_instruct_q40/dllama_tokenizer_llama3_2_1b_instruct_q40.t --buffer-float-type q80 --prompt "Hello world" --steps 256 --nthreads 1 --workers 10.0.2.209:9999 --gpu-index 0`
+    #                   ./dllama chat      --model models/llama3_2_1b_instruct_q40/dllama_model_llama3_2_1b_instruct_q40.m --tokenizer models/llama3_2_1b_instruct_q40/dllama_tokenizer_llama3_2_1b_instruct_q40.t --buffer-float-type q80 --nthreads 1 --max-seq-len 4096 --gpu-index 0

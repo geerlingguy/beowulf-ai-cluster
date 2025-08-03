@@ -1,0 +1,29 @@
+---
+- name: Run llama.cpp benchmark individually on each node.
+  hosts: cluster
+  become: false
+
+  vars_files: ['config.yml']
+
+  tasks:
+    - name: Download the benchmark model.
+      ansible.builtin.get_url:
+        url: "{{ llama_test_model_url }}"
+        checksum: "{{ llama_test_model_checksum }}"
+        force: false
+        dest: "{{ working_dir }}/llama.cpp/models/{{ llama_test_model_filename }}"
+        mode: 0644
+      become: true
+
+    - name: Quick benchmark on each node.
+      ansible.builtin.command:
+        cmd: >
+          build/bin/llama-bench
+          -m "models/{{ llama_test_model_filename }}"
+          {{ llama_bench_opts }}
+        chdir: "{{ working_dir }}/llama.cpp"
+      register: quick_benchmark_run
+
+    - name: Output quick benchmark results.
+      ansible.builtin.debug:
+        var: quick_benchmark_run.stdout

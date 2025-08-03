@@ -2,7 +2,6 @@
 - name: Set up llama.cpp.
   hosts: cluster
   become: false
-  tags: ['llama-setup']
 
   vars_files: ['../config.yml']
 
