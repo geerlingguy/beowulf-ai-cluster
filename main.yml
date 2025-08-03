@@ -1,60 +1,14 @@
 ---
 # Automated setup of a Beowulf AI Cluster.
 
-- name: Compile llama.cpp.
-  hosts: cluster
-  become: false
-  tags: ['llama-setup']
+- name: Set up llama.cpp.
+  ansible.builtin.import_playbook: plays/llama_cpp.yml
 
-  vars_files: ['config.yml']
+- name: Set up distributed-llama.
+  ansible.builtin.import_playbook: plays/distributed_llama.yml
 
-  tasks:
-    - ansible.builtin.include_tasks: dependencies/rhel-based.yml
-      when: ansible_os_family == 'RedHat'
-
-    - ansible.builtin.include_tasks: dependencies/debian-based.yml
-      when: ansible_os_family == 'Debian'
-
-    - name: Ensure working directory exists.
-      ansible.builtin.file:
-        path: "{{ working_dir }}"
-        state: directory
-      become: true
-
-    - name: Clone llama.cpp.
-      ansible.builtin.git:
-        repo: "{{ llama_source }}"
-        dest: "{{ working_dir }}/llama.cpp"
-        version: "{{ llama_version }}"
-      become: true
-
-    - name: Create llama.cpp build directory.
-      ansible.builtin.file:
-        path: "{{ working_dir }}/llama.cpp/build"
-        state: directory
-        mode: 0755
-      become: true
-
-    - name: Configure the build.
-      ansible.builtin.command:
-        cmd: "cmake -B build {{ llama_build_opts }}"
-        chdir: "{{ working_dir }}/llama.cpp"
-        creates: "{{ working_dir }}/llama.cpp/LLAMA_BUILD_COMPLETE"
-      become: true
-
-    - name: Build llama.cpp.
-      ansible.builtin.command:
-        cmd: cmake --build build --config Release
-        chdir: "{{ working_dir }}/llama.cpp"
-        creates: "{{ working_dir }}/llama.cpp/LLAMA_BUILD_COMPLETE"
-      become: true
-
-    - name: Create LLAMA_BUILD_COMPLETE file.
-      ansible.builtin.file:
-        path: "{{ working_dir }}/llama.cpp/LLAMA_BUILD_COMPLETE"
-        state: touch
-        mode: 0644
-      become: true
+- name: Set up Exo.
+  ansible.builtin.import_playbook: plays/exo.yml
 
 - name: Run llama.cpp benchmark individually on each node.
   hosts: cluster

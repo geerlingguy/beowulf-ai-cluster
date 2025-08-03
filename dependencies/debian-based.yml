@@ -13,5 +13,9 @@
       - g++
       - cmake
       - nvtop
+      # For Exo.
+      - python3-pip
+      - python3-dev
+      - libdrm-dev
     state: present
   become: true

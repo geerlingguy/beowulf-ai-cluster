@@ -46,16 +46,16 @@ Eventually I might make it easier to rebuild things automatically. But for now, 
 
 There are multiple benchmarks included:
 
-  - **Llama benchmark - individual nodes**: Runs `llama-bench` on each node indepdently, and can be used to compare relative node performance (or to verify all your nodes have GPUs or NPUs recognized and utilized correctly). Performance results will be printed for each node individually.
-  - **Llama benchmark - full cluster (rpc-server)**: Configures llama.cpp in RPC mode, and runs a benchmark against the entire cluster. Performance results will be summarized for the entire cluster.
+  - **llama.cpp benchmark - individual nodes**: Runs `llama-bench` on each node indepdently, and can be used to compare relative node performance (or to verify all your nodes have GPUs or NPUs recognized and utilized correctly). Performance results will be printed for each node individually.
+  - **llama.cpp benchmark - full cluster (rpc-server)**: Configures llama.cpp in RPC mode, and runs a benchmark against the entire cluster. Performance results will be summarized for the entire cluster.
 
 To run benchmarks, run the playbook with the proper tag:
 
 ```
-# For llama.cpp benchmark on each node individually:
+# For llama.cpp individual node benchmark:
 ansible-playbook main.yml --tags llama-bench
 
-# For llama.cpp benchmark on full cluster (RPC):
+# For llama.cpp full cluster benchmark:
 ansible-playbook main.yml --tags llama-bench-cluster
 ```
 

@@ -1,0 +1,39 @@
+---
+- name: Set up Exo.
+  hosts: cluster
+  become: false
+  tags: ['never', 'exo-setup']
+
+  vars_files: ['../config.yml']
+
+  tasks:
+    - ansible.builtin.include_tasks: ../dependencies/rhel-based.yml
+      when: ansible_os_family == 'RedHat'
+
+    - ansible.builtin.include_tasks: ../dependencies/debian-based.yml
+      when: ansible_os_family == 'Debian'
+
+    - name: Ensure working directory exists.
+      ansible.builtin.file:
+        path: "{{ working_dir }}"
+        state: directory
+      become: true
+
+    - name: Clone Exo.
+      ansible.builtin.git:
+        repo: "{{ exo_source }}"
+        dest: "{{ working_dir }}/exo"
+        version: "{{ exo_version }}"
+      become: true
+
+    - name: Install Exo via pip.
+      ansible.builtin.pip:
+        name: "file://{{ working_dir }}/exo"
+        state: present
+      become: true
+
+    # TODO: To run exo, run `exo` on each node, and it will auto-cluster.
+    # To force a GPU, set `GPU=1`, or like `AMD=1` before running `exo`.
+    #
+    # I'm not going to work on this playbook any more for now, as it seems Exo
+    # is dead: https://github.com/geerlingguy/beowulf-ai-cluster/issues/3

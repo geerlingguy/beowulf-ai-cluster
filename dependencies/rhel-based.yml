@@ -15,5 +15,9 @@
       - glslc
       - libcurl-devel
       - nvtop
+      # For Exo.
+      - python-pip
+      - python-devel
+      - libdrm-devel
     state: present
   become: true

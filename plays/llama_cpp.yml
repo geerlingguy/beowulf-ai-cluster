@@ -1,0 +1,56 @@
+---
+- name: Set up llama.cpp.
+  hosts: cluster
+  become: false
+  tags: ['llama-setup']
+
+  vars_files: ['../config.yml']
+
+  tasks:
+    - ansible.builtin.include_tasks: ../dependencies/rhel-based.yml
+      when: ansible_os_family == 'RedHat'
+
+    - ansible.builtin.include_tasks: ../dependencies/debian-based.yml
+      when: ansible_os_family == 'Debian'
+
+    - name: Ensure working directory exists.
+      ansible.builtin.file:
+        path: "{{ working_dir }}"
+        state: directory
+      become: true
+
+    - name: Clone llama.cpp.
+      ansible.builtin.git:
+        repo: "{{ llama_source }}"
+        dest: "{{ working_dir }}/llama.cpp"
+        version: "{{ llama_version }}"
+      become: true
+
+    - name: Create llama.cpp build directory.
+      ansible.builtin.file:
+        path: "{{ working_dir }}/llama.cpp/build"
+        state: directory
+        mode: 0755
+      become: true
+
+    - name: Configure the build.
+      ansible.builtin.command:
+        cmd: "cmake -B build {{ llama_build_opts }}"
+        chdir: "{{ working_dir }}/llama.cpp"
+        creates: "{{ working_dir }}/LLAMA_BUILD_COMPLETE"
+      become: true
+
+    - name: Build llama.cpp.
+      ansible.builtin.command:
+        cmd: cmake --build build --config Release
+        chdir: "{{ working_dir }}/llama.cpp"
+        creates: "{{ working_dir }}/LLAMA_BUILD_COMPLETE"
+      become: true
+
+    - name: Create LLAMA_BUILD_COMPLETE file.
+      ansible.builtin.copy:
+        content: ''
+        dest: "{{ working_dir }}/LLAMA_BUILD_COMPLETE"
+        force: false
+        mode: 0644
+      become: true
