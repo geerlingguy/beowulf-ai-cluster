@@ -20,10 +20,15 @@ llama_rpc_environment: "GGML_VK_PREFER_HOST_MEMORY=1"
 # Note: You can force using the CPU instead of an iGPU by adding `--device CPU`
 llama_rpc_start_command: "{{ working_dir }}/llama.cpp/build/bin/rpc-server --host {{ ansible_default_ipv4.address }} --port {{ llama_rpc_port }} --cache"
 
-distributed_llama_source: https://github.com/b4rtaz/distributed-llama.git
-distributed_llama_version: main
-distributed_llama_build_environment:
+dllama_source: https://github.com/b4rtaz/distributed-llama.git
+dllama_version: main
+dllama_build_environment:
   DLLAMA_VULKAN: "1"
+
+# See https://github.com/b4rtaz/distributed-llama?tab=readme-ov-file#-setup-root-node-by-single-command
+dllama_test_model: "llama3_2_1b_instruct_q40"
+dllama_worker_start_command: "{{ working_dir }}/distributed-llama/dllama worker --port 9999 --nthreads 1 --gpu-index 0"
+dllama_worker_port: '9999'
 
 exo_source: https://github.com/exo-explore/exo.git
 exo_version: main

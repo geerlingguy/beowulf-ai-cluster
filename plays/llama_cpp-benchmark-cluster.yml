@@ -11,7 +11,7 @@
     - name: restart llama-rpc
       ansible.builtin.service:
         name: llama-rpc
-        state: stopped
+        state: restarted
       become: true
 
   tasks:
@@ -36,7 +36,7 @@
 
     - name: Copy the llama-rpc systemd unit file.
       template:
-        src: llama-rpc.service.j2
+        src: ../templates/llama-rpc.service.j2
         dest: /etc/systemd/system/llama-rpc.service
         mode: 0644
       register: llama_rpc_exporter_service
@@ -56,7 +56,7 @@
         state: started
       become: true
 
-    - name: Run benchmark across all nodes from first node
+    - name: Run benchmark across all nodes from first node.
       ansible.builtin.command:
         cmd: >
           build/bin/llama-bench
@@ -64,11 +64,11 @@
           {{ llama_bench_opts }}
           --rpc {{ rpc_hosts }}
         chdir: "{{ working_dir }}/llama.cpp"
-      register: full_benchmark_run
+      register: llama_full_benchmark_run
       run_once: true
 
     - name: Output the results.
-      debug: var=full_benchmark_run.stdout
+      debug: var=llama_full_benchmark_run.stdout
       run_once: true
 
     - name: Ensure llama-rpc is stopped.

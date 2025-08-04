@@ -1,0 +1,13 @@
+[Unit]
+Description="Distributed Lllama Worker"
+After=network.target
+
+[Service]
+ExecStart={{ dllama_worker_start_command }}
+User={{ llama_user }}
+Group={{ llama_user }}
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

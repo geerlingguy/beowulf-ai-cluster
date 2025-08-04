@@ -6,7 +6,7 @@
   tags: ['llama-setup']
 
 - name: Set up distributed-llama.
-  ansible.builtin.import_playbook: plays/distributed_llama.yml
+  ansible.builtin.import_playbook: plays/dllama.yml
   tags: ['distributed-llama-setup']
 
 - name: Set up Exo.
@@ -20,3 +20,7 @@
 - name: Run llama.cpp benchmark across the full cluster.
   ansible.builtin.import_playbook: plays/llama_cpp-benchmark-cluster.yml
   tags: ['never', 'llama-bench-cluster']
+
+- name: Run distributed-llama benchmark across the full cluster.
+  ansible.builtin.import_playbook: plays/dllama-benchmark-cluster.yml
+  tags: ['never', 'dllama-bench-cluster']

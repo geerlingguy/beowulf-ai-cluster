@@ -48,6 +48,7 @@ There are multiple benchmarks included:
 
   - **llama.cpp benchmark - individual nodes**: Runs `llama-bench` on each node indepdently, and can be used to compare relative node performance (or to verify all your nodes have GPUs or NPUs recognized and utilized correctly). Performance results will be printed for each node individually.
   - **llama.cpp benchmark - full cluster (rpc-server)**: Configures llama.cpp in RPC mode, and runs a benchmark against the entire cluster. Performance results will be summarized for the entire cluster.
+  - **distributed-llama benchmark - full cluster**: Configures distributed-llama workers on all but the root node, then runs a benchmark against the entire cluster.
 
 To run benchmarks, run the playbook with the proper tag:
 
@@ -57,13 +58,18 @@ ansible-playbook main.yml --tags llama-bench
 
 # For llama.cpp full cluster benchmark:
 ansible-playbook main.yml --tags llama-bench-cluster
+
+# For distributed-llama full cluster benchmark:
+ansible-playbook main.yml --tags dllama-bench-cluster
 ```
 
 ## Benchmarks - Manual
 
-If you'd like to run a manual benchmark (e.g. to debug what's happening with something like `llama-bench` on a larger model), here's how to do it:
+If you'd like to run a manual benchmark (e.g. to debug what's happening with something like `llama-bench` on a larger model), here's how to do it.
 
-  1. Launch `llama-rpc`: `ansible all -a "systemctl status llama-rpc" -b`
+### llama.cpp RPC Manual Benchmark
+
+  1. Launch `llama-rpc`: `ansible all -a "systemctl start llama-rpc" -b`
   2. Run a benchmark from one of the nodes (e.g. node 1):
 
 ```
@@ -76,6 +82,26 @@ You can grab all your node IP addresses with:
 ```
 ansible all -m ansible.builtin.setup -a "filter=ansible_default_ipv4"
 ```
+
+When you're finished, stop `llama-rpc`: `ansible all -a "systemctl stop llama-rpc" -b`
+
+### distributed-llama Manual Benchmark
+
+  1. Launch `dllama-worker` on all but the first node: `ansible all,\!framework-1.local -a "systemctl start dllama-worker" -b`
+  2. Run a benchmark from the first node:
+
+```
+cd /opt/distributed-llama
+[todo command goes here...]
+```
+
+You can grab all your node IP addresses with:
+
+```
+ansible all -m ansible.builtin.setup -a "filter=ansible_default_ipv4"
+```
+
+When you're finished, stop `dllama-worker`: `ansible all -a "systemctl stop dllama-worker" -b`
 
 ## License
 

@@ -1,0 +1,85 @@
+---
+- name: Run distributed-llama benchmark across the full cluster.
+  hosts: cluster
+  become: false
+
+  vars_files: ['../config.yml']
+  vars:
+    host_ips: []
+
+  handlers:
+    - name: restart dllama-worker
+      ansible.builtin.service:
+        name: dllama-worker
+        state: restarted
+      become: true
+
+  tasks:
+    # TODO: Waiting on https://github.com/b4rtaz/distributed-llama/issues/236
+    # - name: Download the benchmark model.
+    #   ansible.builtin.command:
+    #     cmd: "python launch.py {{ dllama_test_model }}"
+    #     chdir: "{{ working_dir }}/distributed-llama"
+    #   become: true
+
+    - name: Generate list of host IP addresses (excepting the first host).
+      ansible.builtin.set_fact:
+        host_ips: "{{ host_ips + [ hostvars[item].ansible_default_ipv4.address ] }}"
+      loop: "{{ groups['cluster'][1:] }}"
+
+    - name: Generate worker node list from host IP addresses.
+      ansible.builtin.set_fact:
+        dllama_root_node: "{{ groups['cluster'] | first }}"
+        dllama_worker_nodes: "{{ host_ips | join(':' + dllama_worker_port + ' ') }}:{{ dllama_worker_port }}"
+      run_once: true
+
+    - name: Copy the dllama-worker systemd unit file.
+      template:
+        src: ../templates/dllama-worker.service.j2
+        dest: /etc/systemd/system/dllama-worker.service
+        mode: 0644
+      register: dllama_worker_service
+      notify: restart dllama-worker
+      become: true
+
+    - name: Reload systemd daemon if unit file is changed.
+      systemd:
+        daemon_reload: true
+      notify: restart dllama-worker
+      when: dllama_worker_service is changed
+      become: true
+
+    - name: Ensure dllama-worker is running (excepting the root node).
+      service:
+        name: dllama-worker
+        state: started
+      become: true
+      when: inventory_hostname != dllama_root_node
+
+    - name: Run benchmark across all nodes from root node.
+      ansible.builtin.shell:
+        cmd: >-
+          ./dllama inference
+          --model models/llama3_2_1b_instruct_q40/dllama_model_llama3_2_1b_instruct_q40.m
+          --tokenizer models/llama3_2_1b_instruct_q40/dllama_tokenizer_llama3_2_1b_instruct_q40.t
+          --buffer-float-type q80
+          --prompt "Why is the sky blue"
+          --steps 256
+          --max-seq-len 4096
+          --nthreads 1
+          --gpu-index 0
+          --workers {{ dllama_worker_nodes }}
+        chdir: "{{ working_dir }}/distributed-llama"
+      register: dllama_full_benchmark_run
+      run_once: true
+      delegate_to: "{{ dllama_root_node }}"
+
+    - name: Output the results.
+      debug: var=dllama_full_benchmark_run.stdout
+      run_once: true
+
+    - name: Ensure dllama-worker is stopped.
+      service:
+        name: dllama-worker
+        state: stopped
+      become: true
