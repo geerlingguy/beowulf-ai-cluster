@@ -64,7 +64,7 @@
           --model models/llama3_2_1b_instruct_q40/dllama_model_llama3_2_1b_instruct_q40.m
           --tokenizer models/llama3_2_1b_instruct_q40/dllama_tokenizer_llama3_2_1b_instruct_q40.t
           --buffer-float-type q80
-          --prompt "Why is the sky blue"
+          --prompt "Hello world"
           --steps 256
           --max-seq-len 4096
           --nthreads 1
