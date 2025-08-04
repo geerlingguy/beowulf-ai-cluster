@@ -22,7 +22,7 @@ llama_bench_opts: "-n 128 -ngl 99 -fa 1 -r 2"
 llama_rpc_port: "50052"
 llama_rpc_environment: "GGML_VK_PREFER_HOST_MEMORY=1"
 # Note: You can force using the CPU instead of an iGPU by adding `--device CPU`
-llama_rpc_start_command: "{{ working_dir }}/llama.cpp/build/bin/rpc-server --host {{ ansible_default_ipv4.address }} --port {{ llama_rpc_port }} --cache"
+llama_rpc_start_command: "{{ working_dir }}/llama.cpp/build/bin/rpc-server --host {{ ansible_default_ipv4.address }} --port {{ llama_rpc_port }} --threads {{ ansible_processor_vcpus }} --cache"
 
 ##############
 # Exo settings
