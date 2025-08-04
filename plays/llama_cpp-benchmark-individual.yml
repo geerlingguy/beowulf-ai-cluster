@@ -3,7 +3,7 @@
   hosts: cluster
   become: false
 
-  vars_files: ['config.yml']
+  vars_files: ['../config.yml']
 
   tasks:
     - name: Download the benchmark model.
