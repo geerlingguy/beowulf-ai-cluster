@@ -3,9 +3,10 @@ Description="Distributed Lllama Worker"
 After=network.target
 
 [Service]
+WorkingDirectory={{ working_dir }}/distributed-llama
 ExecStart={{ dllama_worker_start_command }}
-User={{ llama_user }}
-Group={{ llama_user }}
+User={{ dllama_user }}
+Group={{ dllama_user }}
 Restart=always
 RestartSec=5
 

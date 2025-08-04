@@ -13,6 +13,7 @@
         name: dllama-worker
         state: restarted
       become: true
+      when: inventory_hostname != dllama_root_node
 
   tasks:
     # TODO: Waiting on https://github.com/b4rtaz/distributed-llama/issues/236
