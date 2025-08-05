@@ -92,7 +92,17 @@ When you're finished, stop `llama-rpc`: `ansible all -a "systemctl stop llama-rp
 
 ```
 cd /opt/distributed-llama
-./dllama inference --model models/llama3_2_1b_instruct_q40/dllama_model_llama3_2_1b_instruct_q40.m --tokenizer models/llama3_2_1b_instruct_q40/dllama_tokenizer_llama3_2_1b_instruct_q40.t --buffer-float-type q80 --prompt "Why is the sky blue" --steps 256 --max-seq-len 4096 --nthreads 1 --gpu-index 0 --workers 10.0.2.209:9999 10.0.2.242:9999 10.0.2.223:9999
+./dllama inference \
+  --model models/llama3_2_1b_instruct_q40/dllama_model_llama3_2_1b_instruct_q40.m \
+  --tokenizer models/llama3_2_1b_instruct_q40/dllama_tokenizer_llama3_2_1b_instruct_q40.t \
+  --buffer-float-type q80 \
+  --prompt "Can you explain a hello world program" \
+  --steps 256 \
+  --max-seq-len 4096 \
+  --nthreads 1 \
+  --net-turbo 0 \
+  --gpu-index 0 \
+  --workers 10.0.2.209:9999 10.0.2.242:9999 10.0.2.223:9999
 ```
 
 You can grab all your node IP addresses with:

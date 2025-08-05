@@ -16,13 +16,6 @@
       when: inventory_hostname != dllama_root_node
 
   tasks:
-    # TODO: Waiting on https://github.com/b4rtaz/distributed-llama/issues/236
-    # - name: Download the benchmark model.
-    #   ansible.builtin.command:
-    #     cmd: "python launch.py {{ dllama_test_model }}"
-    #     chdir: "{{ working_dir }}/distributed-llama"
-    #   become: true
-
     - name: Generate list of host IP addresses (excepting the first host).
       ansible.builtin.set_fact:
         host_ips: "{{ host_ips + [ hostvars[item].ansible_default_ipv4.address ] }}"
@@ -33,6 +26,15 @@
         dllama_root_node: "{{ groups['cluster'] | first }}"
         dllama_worker_nodes: "{{ host_ips | join(':' + dllama_worker_port + ' ') }}:{{ dllama_worker_port }}"
       run_once: true
+
+    - name: Download the benchmark model.
+      ansible.builtin.command:
+        cmd: "python launch.py {{ dllama_test_model }} -skip-run -skip-script"
+        chdir: "{{ working_dir }}/distributed-llama"
+        creates: "{{ working_dir }}/distributed-llama/models/{{ dllama_test_model }}/dllama_model_{{ dllama_test_model }}.m"
+      become: true
+      run_once: true
+      delegate_to: "{{ dllama_root_node }}"
 
     - name: Copy the dllama-worker systemd unit file.
       template:
@@ -61,8 +63,8 @@
       ansible.builtin.shell:
         cmd: >-
           ./dllama inference
-          --model models/llama3_2_1b_instruct_q40/dllama_model_llama3_2_1b_instruct_q40.m
-          --tokenizer models/llama3_2_1b_instruct_q40/dllama_tokenizer_llama3_2_1b_instruct_q40.t
+          --model models/{{ dllama_test_model }}/dllama_model_{{ dllama_test_model }}.m
+          --tokenizer models/{{ dllama_test_model }}/dllama_tokenizer_{{ dllama_test_model }}.t
           --buffer-float-type q80
           --prompt "Hello world"
           --steps 256
