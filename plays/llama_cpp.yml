@@ -41,7 +41,7 @@
 
     - name: Build llama.cpp.
       ansible.builtin.command:
-        cmd: cmake --build build --config Release
+        cmd: cmake --build build --config Release -j {{ ansible_processor_vcpus }}
         chdir: "{{ working_dir }}/llama.cpp"
         creates: "{{ working_dir }}/LLAMA_BUILD_COMPLETE"
       become: true
