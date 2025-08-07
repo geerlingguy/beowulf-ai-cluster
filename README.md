@@ -1,5 +1,7 @@
 # Beowulf AI Cluster
 
+<p align="center"><img alt="Framework Mainboard beowulf AI cluster on desk" src="/resources/beowulf-cluster-framework-desktop.jpg" height="auto" width="600"></p>
+
 With AI getting all the headlines and stock bubbles recently, I thought I'd create a project I can use to test out various distributed AI clustering tools on the various clusters I test.
 
 ## Installation and Usage
