@@ -115,6 +115,12 @@ ansible all -m ansible.builtin.setup -a "filter=ansible_default_ipv4"
 
 When you're finished, stop `dllama-worker`: `ansible all -a "systemctl stop dllama-worker" -b`
 
+## Benchmark Results
+
+_Currently_ I'm storing all benchmark results in my [ollama-benchmark](https://github.com/geerlingguy/ollama-benchmark?tab=readme-ov-file#findings) project.
+
+I will eventually move cluster benchmarks into this repository, I think. I'm just lazy so they're all over there now.
+
 ## License
 
 GPLv3
