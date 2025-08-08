@@ -36,20 +36,12 @@
       ansible.builtin.command:
         cmd: "cmake -B build {{ llama_build_opts }}"
         chdir: "{{ working_dir }}/llama.cpp"
-        creates: "{{ working_dir }}/LLAMA_BUILD_COMPLETE"
+        creates: "{{ working_dir }}/llama.cpp/build/bin/llama-cli"
       become: true
 
     - name: Build llama.cpp.
       ansible.builtin.command:
         cmd: cmake --build build --config Release -j {{ ansible_processor_vcpus }}
         chdir: "{{ working_dir }}/llama.cpp"
-        creates: "{{ working_dir }}/LLAMA_BUILD_COMPLETE"
-      become: true
-
-    - name: Create LLAMA_BUILD_COMPLETE file.
-      ansible.builtin.copy:
-        content: ''
-        dest: "{{ working_dir }}/LLAMA_BUILD_COMPLETE"
-        force: false
-        mode: 0644
+        creates: "{{ working_dir }}/llama.cpp/build/bin/llama-cli"
       become: true
