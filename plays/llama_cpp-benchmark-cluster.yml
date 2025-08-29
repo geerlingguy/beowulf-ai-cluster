@@ -23,6 +23,8 @@
         dest: "{{ working_dir }}/llama.cpp/models/{{ llama_test_model_filename }}"
         mode: 0644
       become: true
+      delegate_to: "{{ groups['cluster'] | first }}"
+      run_once: true
 
     - name: Generate list of host IP addresses.
       ansible.builtin.set_fact:
