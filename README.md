@@ -115,6 +115,20 @@ ansible all -m ansible.builtin.setup -a "filter=ansible_default_ipv4"
 
 When you're finished, stop `dllama-worker`: `ansible all -a "systemctl stop dllama-worker" -b`
 
+## Exo Manual Benchmark
+
+Because Exo's development seems to be at a standstill, the _only_ way I currently support Exo benchmarking is running it manually.
+
+First, run the Exo setup playbook:
+
+```
+ansible-playbook main.yml --tags exo-setup
+```
+
+Then, log into each node and launch Exo (run `exo`)
+
+Visit any node IP address or hostname in the browser using the port indicated in Exo's output, and you'll be greeted by a TinyChat UI. Start a chat to initiate a model download.
+
 ## Benchmark Results
 
 _Currently_ I'm storing all benchmark results in my [ollama-benchmark](https://github.com/geerlingguy/ollama-benchmark?tab=readme-ov-file#findings) project.

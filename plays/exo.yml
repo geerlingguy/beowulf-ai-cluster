@@ -12,6 +12,12 @@
     - ansible.builtin.include_tasks: ../dependencies/debian-based.yml
       when: ansible_os_family == 'Debian'
 
+    - name: Install extra packages.
+      ansible.builtin.package:
+        name: "{{ exo_extra_packages }}"
+        state: present
+      become: true
+
     - name: Ensure working directory exists.
       ansible.builtin.file:
         path: "{{ working_dir }}"
@@ -29,6 +35,7 @@
       ansible.builtin.pip:
         name: "file://{{ working_dir }}/exo"
         state: present
+        break_system_packages: true
       become: true
 
     # TODO: To run exo, run `exo` on each node, and it will auto-cluster.

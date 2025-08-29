@@ -36,6 +36,8 @@ llama_rpc_start_command: "{{ working_dir }}/llama.cpp/build/bin/rpc-server --hos
 # Exo settings
 ##############
 
+exo_extra_packages: []
+
 exo_source: https://github.com/exo-explore/exo.git
 exo_version: main
 
