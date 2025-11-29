@@ -12,6 +12,8 @@ llama_user: "{{ ansible_user }}"
 
 llama_source: https://github.com/ggerganov/llama.cpp
 llama_version: master
+
+# On DGX Spark / DGX OS, add '-DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc'
 llama_build_opts: "-DGGML_VULKAN=1 -DGGML_RPC=ON"
 
 # Llama 3.2:3B Test Model (1.87 GB)
@@ -30,7 +32,12 @@ llama_bench_opts: "-n 128 -ngl 99 -fa 1 -r 2"
 llama_rpc_port: "50052"
 llama_rpc_environment: "GGML_VK_PREFER_HOST_MEMORY=1"
 # Note: You can force using the CPU instead of an iGPU by adding `--device CPU`
-llama_rpc_start_command: "{{ working_dir }}/llama.cpp/build/bin/rpc-server --host {{ ansible_default_ipv4.address }} --port {{ llama_rpc_port }} --threads {{ ansible_processor_vcpus }} --cache"
+llama_rpc_start_command: >-
+  {{ working_dir }}/llama.cpp/build/bin/rpc-server
+  --host 0.0.0.0
+  --port {{ llama_rpc_port }}
+  --threads {{ ansible_processor_vcpus }}
+  --cache
 
 ##############
 # Exo settings

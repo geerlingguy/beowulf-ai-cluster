@@ -26,10 +26,13 @@
       delegate_to: "{{ groups['cluster'] | first }}"
       run_once: true
 
-    - name: Generate list of host IP addresses.
+    # TODO: Make rpc_hosts configurable. If already supplied via config.yml vars
+    # skip these two tasks, as detecting the correct interface on many servers
+    # is difficult.
+    - name: Generate list of host IP addresses (excepting the first host).
       ansible.builtin.set_fact:
         host_ips: "{{ host_ips + [ hostvars[item].ansible_default_ipv4.address ] }}"
-      loop: "{{ groups['cluster'] }}"
+      loop: "{{ groups['cluster'][1:] }}"
 
     - name: Generate RPC host list from host IP addresses.
       ansible.builtin.set_fact:
