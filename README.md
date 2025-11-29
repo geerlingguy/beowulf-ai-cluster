@@ -23,7 +23,7 @@ Tweak other settings inside `config.yml` as desired.
 >
 > `sudo apt-get install avahi-daemon`
 
-Then run the benchmarking playbook inside this directory:
+Then run the Ansible playbook inside this directory:
 
 ```
 ansible-playbook main.yml
@@ -52,7 +52,7 @@ There are multiple benchmarks included:
   - **llama.cpp benchmark - full cluster (rpc-server)**: Configures llama.cpp in RPC mode, and runs a benchmark against the entire cluster. Performance results will be summarized for the entire cluster.
   - **distributed-llama benchmark - full cluster**: Configures distributed-llama workers on all but the root node, then runs a benchmark against the entire cluster.
 
-To run benchmarks, run the playbook with the proper tag:
+To run benchmarks, run the playbook with the proper tag (run the individual benchmark at least one time first, to make sure everything is set up):
 
 ```
 # For llama.cpp individual node benchmark:
