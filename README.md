@@ -76,7 +76,7 @@ If you'd like to run a manual benchmark (e.g. to debug what's happening with som
 
 ```
 cd /opt/llama.cpp
-build/bin/llama-bench -v -m models/Llama-3.1-405B-Q4_K_M.gguf -n 128 -p 512 -pg 512,128 -ngl 125 -fa 1 -r 2 --rpc 10.0.2.233:50052,10.0.2.209:50052,10.0.2.242:50052,10.0.2.223:50052
+build/bin/llama-bench -v -m models/Llama-3.1-405B-Q4_K_M.gguf -n 128 -ngl 199 -p 512,4096 -pg 4096,128 -fa 1 -r 1 --rpc 10.0.2.233:50052,10.0.2.209:50052,10.0.2.242:50052,10.0.2.223:50052
 ```
 
 You can grab all your node IP addresses with:

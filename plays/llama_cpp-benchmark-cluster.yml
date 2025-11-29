@@ -17,10 +17,10 @@
   tasks:
     - name: Download the benchmark model.
       ansible.builtin.get_url:
-        url: "{{ llama_test_model_url }}"
-        checksum: "{{ llama_test_model_checksum }}"
+        url: "{{ llama_test_model.url }}"
+        checksum: "{{ llama_test_model.checksum | default(omit) }}"
         force: false
-        dest: "{{ working_dir }}/llama.cpp/models/{{ llama_test_model_filename }}"
+        dest: "{{ working_dir }}/llama.cpp/models/{{ llama_test_model.filename }}"
         mode: 0644
       become: true
       delegate_to: "{{ groups['cluster'] | first }}"
@@ -64,7 +64,7 @@
       ansible.builtin.command:
         cmd: >
           build/bin/llama-bench
-          -m "models/{{ llama_test_model_filename }}"
+          -m "models/{{ llama_test_model.filename }}"
           {{ llama_bench_opts }}
           --rpc {{ llama_rpc_hosts }}
         chdir: "{{ working_dir }}/llama.cpp"

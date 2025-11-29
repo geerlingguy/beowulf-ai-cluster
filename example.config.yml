@@ -17,17 +17,24 @@ llama_version: master
 llama_build_opts: "-DGGML_VULKAN=1 -DGGML_RPC=ON"
 
 # Llama 3.2:3B Test Model (1.87 GB)
-llama_test_model_url: https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf
-llama_test_model_checksum: "sha256:6c1a2b41161032677be168d354123594c0e6e67d2b9227c84f296ad037c728ff"
-llama_test_model_filename: "Llama-3.2-3B-Instruct-Q4_K_M.gguf"
+llama_test_model:
+  url: https://huggingface.co/bartowski/Llama-3.2-3B-Instruct-GGUF/resolve/main/Llama-3.2-3B-Instruct-Q4_K_M.gguf
+  checksum: "sha256:6c1a2b41161032677be168d354123594c0e6e67d2b9227c84f296ad037c728ff"
+  filename: "Llama-3.2-3B-Instruct-Q4_K_M.gguf"
 
-# Llama 3.3:70B Test Model (39.59 GB)
-#llama_test_model_url: https://huggingface.co/bartowski/Llama-3.3-70B-Instruct-GGUF/resolve/main/Llama-3.3-70B-Instruct-Q4_K_M.gguf
-#llama_test_model_checksum: "sha256:32df3baccb556f9840059b2528b2dee4d3d516b24afdfb9d0c56ff5f63e3a664"
-#llama_test_model_filename: "Llama-3.3-70B-Instruct-Q4_K_M.gguf"
+# The checksum is optional, and can be omitted, e.g. with Llama3.3:70B (40GB).
+# Note: omitting the checksum forces Ansible to re-download the file.
+#
+# llama_test_model:
+#   url: https://huggingface.co/bartowski/Llama-3.3-70B-Instruct-GGUF/resolve/main/Llama-3.3-70B-Instruct-Q4_K_M.gguf
+#   filename: "Llama-3.3-70B-Instruct-Q4_K_M.gguf"
+#
+# For multi-part models (e.g. 00001-of-00003.gguf), you can specify the URL and
+# filename of the first model part, and manually download the model files before
+# running the playbook.
 
 # See https://github.com/ggml-org/llama.cpp/blob/master/tools/llama-bench/README.md#syntax
-llama_bench_opts: "-n 128 -ngl 99 -fa 1 -r 2"
+llama_bench_opts: "-n 128 -ngl 199 -fa 1 -r 2"
 
 llama_rpc_port: "50052"
 
