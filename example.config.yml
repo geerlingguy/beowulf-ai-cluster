@@ -30,6 +30,12 @@ llama_test_model_filename: "Llama-3.2-3B-Instruct-Q4_K_M.gguf"
 llama_bench_opts: "-n 128 -ngl 99 -fa 1 -r 2"
 
 llama_rpc_port: "50052"
+
+# RPC hosts automatically use the first ipv4 address if you leave this empty.
+# On systems with multiple network interfaces, you can manually override the
+# list, e.g. "ip_address2:50052,ip_address3:50052" (excluding the first node).
+llama_rpc_hosts: ""
+
 llama_rpc_environment: "GGML_VK_PREFER_HOST_MEMORY=1"
 # Note: You can force using the CPU instead of an iGPU by adding `--device CPU`
 llama_rpc_start_command: >-

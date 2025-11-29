@@ -26,18 +26,17 @@
       delegate_to: "{{ groups['cluster'] | first }}"
       run_once: true
 
-    # TODO: Make rpc_hosts configurable. If already supplied via config.yml vars
-    # skip these two tasks, as detecting the correct interface on many servers
-    # is difficult.
     - name: Generate list of host IP addresses (excepting the first host).
       ansible.builtin.set_fact:
         host_ips: "{{ host_ips + [ hostvars[item].ansible_default_ipv4.address ] }}"
       loop: "{{ groups['cluster'][1:] }}"
+      when: "llama_rpc_hosts | length == 0"
 
     - name: Generate RPC host list from host IP addresses.
       ansible.builtin.set_fact:
-        rpc_hosts: "{{ host_ips | join(':' + llama_rpc_port + ',') }}:{{ llama_rpc_port }}"
+        llama_rpc_hosts: "{{ host_ips | join(':' + llama_rpc_port + ',') }}:{{ llama_rpc_port }}"
       run_once: true
+      when: "llama_rpc_hosts | length == 0"
 
     - name: Copy the llama-rpc systemd unit file.
       template:
@@ -67,7 +66,7 @@
           build/bin/llama-bench
           -m "models/{{ llama_test_model_filename }}"
           {{ llama_bench_opts }}
-          --rpc {{ rpc_hosts }}
+          --rpc {{ llama_rpc_hosts }}
         chdir: "{{ working_dir }}/llama.cpp"
       register: llama_full_benchmark_run
       run_once: true
