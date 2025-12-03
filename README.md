@@ -4,6 +4,8 @@
 
 With AI getting all the headlines and stock bubbles recently, I thought I'd create a project I can use to test out various distributed AI clustering tools on the various clusters I test.
 
+**For single-node AI benchmarking**, see my separate [ai-benchmarks](https://github.com/geerlingguy/ai-benchmarks) project.
+
 ## Installation and Usage
 
 Make sure you have Ansible installed (`pip3 install ansible`), then copy the following files:
@@ -131,7 +133,7 @@ Visit any node IP address or hostname in the browser using the port indicated in
 
 ## Benchmark Results
 
-_Currently_ I'm storing all benchmark results in my [ollama-benchmark](https://github.com/geerlingguy/ollama-benchmark?tab=readme-ov-file#findings) project.
+All benchmark results are currently stored in my [ai-benchmarks](https://github.com/geerlingguy/ai-benchmarks?tab=readme-ov-file#findings) project.
 
 I will eventually move cluster benchmarks into this repository, I think. I'm just lazy so they're all over there now.
 
