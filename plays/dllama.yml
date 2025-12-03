@@ -25,6 +25,14 @@
         version: "{{ dllama_version }}"
       become: true
 
+    - name: Fix sgemm.cpp SSE/AVX include guard
+      ansible.builtin.replace:
+        path: "{{ working_dir }}/distributed-llama/src/nn/llamafile/sgemm.cpp"
+        regexp: '^#elif defined\(__AVX2__\)$'
+        replace: '#elif defined(__SSE__) || defined(__AVX__) || defined(__AVX2__) || defined(__AVX512F__)'
+        backup: yes
+      become: true
+
     - name: Build distributed-llama.
       community.general.make:
         chdir: "{{ working_dir }}/distributed-llama"
